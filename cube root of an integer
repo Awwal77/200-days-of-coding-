@@ -1,0 +1,68 @@
+import time
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Efficient cube root function using binary search
+def cube_root(n):
+    steps = 0  # Step counter
+    if n == 0:
+        return 0, steps
+    
+    # Handle negative numbers
+    neg = n < 0
+    n = abs(n)
+    
+    # Binary search bounds
+    low = 0
+    high = n
+    while low <= high:
+        steps += 1
+        mid = (low + high) // 2
+        mid_cubed = mid ** 3
+        
+        if mid_cubed == n:
+            return -mid if neg else mid, steps
+        elif mid_cubed < n:
+            low = mid + 1
+        else:
+            high = mid - 1
+            
+    # If not a perfect cube, return closest integer
+    return -high if neg else high, steps
+
+# Generate data for graphing
+digit_counts = list(range(1, 20))  # Testing integers with 1 to 19 digits
+step_results = []
+time_results = []
+
+for d in digit_counts:
+    test_num = 10**d - 1  # Largest number with `d` digits
+    start = time.time()
+    _, steps = cube_root(test_num)
+    end = time.time()
+    
+    step_results.append(steps)
+    time_results.append(end - start)
+
+# Plotting steps vs digit count
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.plot(digit_counts, step_results, marker='o')
+plt.title("Steps vs Number of Digits")
+plt.xlabel("Number of Digits")
+plt.ylabel("Steps Taken")
+
+# Plotting time vs digit count
+plt.subplot(1, 2, 2)
+plt.plot(digit_counts, time_results, marker='o', label="Python")
+# Note: C version is theoretical comparison
+# We'll assume C is ~10x faster on average for this task
+plt.plot(digit_counts, [t/10 for t in time_results], linestyle='--', marker='x', label="C (Estimated)")
+plt.title("Time vs Number of Digits")
+plt.xlabel("Number of Digits")
+plt.ylabel("Execution Time (s)")
+plt.legend()
+
+plt.tight_layout()
+plt.show()
